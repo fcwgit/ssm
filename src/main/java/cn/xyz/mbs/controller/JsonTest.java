@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * Created by fanchengwei on 2017/8/1.
+ * test github
  */
 @Controller
 public class JsonTest {
