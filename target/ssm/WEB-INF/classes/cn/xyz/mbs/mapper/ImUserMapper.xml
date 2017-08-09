@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.xyz.mbs.mapper.ImUserMapper">
+    <!--定义用户查询sql片段，就是查询条件-->
+    <sql id="query_imuser_where">
+        <!-- 使用动态sql，通过if判断，满足条件进行sql拼接 -->
+        <!-- 查询条件通过ImUserVo包装对象中的imUserCustom属性传递-->
+        im_user.USR_ID = im_user_role_rel.URR_USERID
+        AND im_user_role_rel.URR_ROLEID = im_role.ROL_ID
+        <if test="imUserCustom!=null">
+            <if test="imUserCustom.id!=null and imUserCustom.id!=''">
+                AND im_user.USR_ID = #{imUserCustom.id}
+            </if>
+            <if test="imUserCustom.name!=null and imUserCustom.name!=''">
+                AND im_user.USR_NAME LIKE '%${imUserCustom.name}%'
+            </if>
+        </if>
+
+    </sql>
+    <!--用户信息列表查询
+        parameterType传入包装对象（包装了查询条件）
+        resultType建议使用扩展对象
+    -->
+    <select id="selectImUserByIdAndName" parameterType="cn.xyz.mbs.po.ImUserVo" resultType="cn.xyz.mbs.po.ImUserCustom">
+        SELECT
+            im_user.USR_ID id,
+            im_user.USR_BRANCHID branchid,
+            im_user.USR_NAME name,
+            im_user.USR_MOBILE phone,
+            im_role.ROL_ID roleId,
+            im_role.ROL_NAME rolename,
+            im_role.ROL_LEVEL rolelevel
+        FROM
+            im_user,
+            im_role,
+            im_user_role_rel
+        <where>
+            <include refid="query_imuser_where"/>
+        </where>
+
+    </select>
+
+    <select id="selectImUserById" parameterType="cn.xyz.mbs.po.ImUserVo" resultType="cn.xyz.mbs.po.ImUser">
+        SELECT
+            im_user.USR_ID id,
+            im_user.USR_BRANCHID branchid,
+            im_user.USR_NAME name,
+            im_user.USR_MOBILE phone,
+            im_role.ROL_ID roleId,
+            im_role.ROL_NAME rolename,
+            im_role.ROL_LEVEL rolelevel
+        FROM
+            im_user,
+            im_role,
+            im_user_role_rel
+        <where>
+            <include refid="query_imuser_where"/>
+        </where>
+    </select>
+
+    <update id="updateImUserById" parameterType="cn.xyz.mbs.po.ImUserCustom">
+        UPDATE im_user
+        SET im_user.USR_NAME=#{name}
+        WHERE im_user.USR_ID=#{id}
+    </update>
+
+</mapper>
